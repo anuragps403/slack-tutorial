@@ -12,7 +12,7 @@ import {
 import { useAuthActions } from "@convex-dev/auth/react";
 
 import React from 'react'
-import { useCurrentUser } from "../hooks/user-current-user";
+import { useCurrentUser } from "../api/user-current-user";
 import { Loader, LogOut } from "lucide-react";
 
 export const UserButton = () => {
