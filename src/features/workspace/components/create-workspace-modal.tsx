@@ -1,15 +1,37 @@
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useCreateWorkspaceModal } from "../store/use-create-workspace-modal";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { useCreateWorkspace } from "../api/use-create-workspace";
 
 export const CreateWorkspaceModal = () => {
+    const router = useRouter()
     const  [ open, setOpen ] = useCreateWorkspaceModal();
+    const [name, setName] = useState("");
+    
+    const { mutate, isPending } = useCreateWorkspace();
 
     const handleClose = () => {
         setOpen(false);
+        setName("");
         // TODO: Clear form 
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        mutate({ name }, {
+            onSuccess(id) {
+                toast.success("Workspace created")
+                router.push(`/workspace/${id}`);
+                handleClose();
+            }
+        })
     };
 
     return (
@@ -18,17 +40,18 @@ export const CreateWorkspaceModal = () => {
                 <DialogHeader>
                     <DialogTitle>Add a workspace</DialogTitle>
                 </DialogHeader>
-                <form className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <Input 
-                        value=""
-                        disabled={false}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        disabled={isPending}
                         required
                         autoFocus
                         minLength={3}
                         placeholder="Workspace name e.g. 'Work', 'Personal', 'Home'"
                     />
                     <div className="flex justify-end">
-                        <Button disabled={false}>
+                        <Button disabled={isPending}>
                             Create
                         </Button>
                     </div>
